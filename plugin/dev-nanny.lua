@@ -23,7 +23,8 @@ vim.api.nvim_create_autocmd({'BufReadPost'}, {
 })
 
 require('lsp')
+require('dap-ui')
+require('keybinding')
 
--- require('keybinding')
 -- require('command')
 
