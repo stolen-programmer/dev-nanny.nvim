@@ -51,11 +51,11 @@ local function parse_configurations(configurations)
 end
 
 --- @param targets table
-local function parse_targets(targets)
+local function parse_targets(targets, buildDir)
     
     for name, targetJsonFile in pairs(targets) do
         local targetJson = json_parse(M.reply_base .. targetJsonFile)
-        targets[name] = targetJson.artifacts[1].path
+        targets[name] = (buildDir or '/build/') .. targetJson.artifacts[1].path
     end
 end
 
@@ -99,7 +99,8 @@ local function cmake_job(id, data, event)
             type = 'lldb',
             request = 'launch',
             name = 'Launch (' .. name .. ') - '.. path,
-            program  =os.getenv('PWD') .. '/build/' ..  path
+            program = os.getenv('PWD') .. path,
+            console = 'integratedTerminal'
         })
     end
 
@@ -126,7 +127,7 @@ local function cmake_activation()
 
     cmake_prepare()
 
-    vim.fn.jobstart('cmake -B build -DCMAKE_BUILD_TYPE=Debug', {
+    vim.fn.jobstart('cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON', {
         on_exit = cmake_job
     })
 
